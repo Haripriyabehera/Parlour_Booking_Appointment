@@ -1,0 +1,20 @@
+# Node modules (do not track dependencies)
+node_modules/
+
+# Environment variables (security reasons)
+.env
+
+# Logs and debug files
+*.log
+logs/
+npm-debug.log
+yarn-error.log
+
+# Build files
+dist/
+coverage/
+
+# System files
+.DS_Store
+Thumbs.db
+
