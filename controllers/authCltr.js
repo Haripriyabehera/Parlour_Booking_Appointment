@@ -80,15 +80,21 @@ authController.profile = async (req, res) => {
 authController.updateProfile = async (req, res) => {
 
     const userId = req.currentUser.userId
-    const body = req.body
+    const { password, ...updateData} = req.body
 
     try {
-        const updateUser = await User.findByIdAndUpdate(userId, body, { new: true, runValidators: true });
+        const updateUser = await User.findByIdAndUpdate(userId, updateData, { new: true, runValidators: true });
         if(!updateUser) {
            return res.status(404).json({message: "User not found"})
         }
 
-        res.json(updateUser)
+        if(password) {
+            const salt = await bcryptjs.genSalt()
+            updateUser.password = await bcryptjs.hash(password, salt)
+            await updateUser.save()
+        }
+        
+        res.json({ success: true, data: updateUser})
     }
     catch(error) {
         res.status(500).json({ error: error.message})
