@@ -59,7 +59,7 @@ authController.login = async (req, res) => {
    }
 }
 
-// get  profile 
+// User  profile 
 authController.profile = async (req, res) => {
     try{
         const user = await User.findById(req.currentUser.userId)
@@ -78,18 +78,14 @@ authController.profile = async (req, res) => {
 
 // update profile
 authController.updateProfile = async (req, res) => {
-    const errors = validationResult(req)
-    if(!errors.isEmpty()) {
-        return res.status(400).json({message: errors.array()})
-    }
 
     const userId = req.currentUser.userId
     const body = req.body
 
     try {
-        const updateUser = await User.findByIdAndUpdate(userId, body, {new: true, runValidator: true})
+        const updateUser = await User.findByIdAndUpdate(userId, body, { new: true, runValidators: true });
         if(!updateUser) {
-            res.status(404).json({message: "User not found"})
+           return res.status(404).json({message: "User not found"})
         }
 
         res.json(updateUser)
@@ -99,5 +95,54 @@ authController.updateProfile = async (req, res) => {
     }
 }
 
+// Delete a user 
+authController.deleteUser = async (req, res) => {
+    if (!req.currentUser) {
+        return res.status(401).json({ message: "Unauthorized. Please log in again." });
+    }
+    const userId = req.currentUser.userId
+    try {
+        const user = await User.findByIdAndDelete(userId)
+        if(!user) {
+            res.status(404).json({message: "User not found"})
+        }
+        res.json({ message: "User deleted successfully"})
+    }
+    catch (error) {
+        res.status(500).json({message: error.message})
+    }
+}
+
+// All admin users
+authController.allAdmins = async (req, res) => {
+    
+    try {
+        const admins = await User.find({role: "admin"})
+
+        if(!admins.length) {
+            return res.status(404).json({ sucess: false, message: "No admin users found"})
+        }
+        res.json({ success: true, data: admins})
+    }
+    catch(error) {
+        res.status(500).json({message: error.message})
+    }
+
+}
+
+//Get all users
+authController.allUsers = async (req, res) => {
+    try {
+        const users = await User.find({role: "user"})
+        if(!users.length) {
+            return res.status(404).json({message: "No users found"})
+        }
+        res.json({ success: true, data: users})
+    }
+    catch(error) {
+        res.status(500).json({message: error.message})
+    }
+}
 
 export default authController
+

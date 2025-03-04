@@ -11,7 +11,8 @@ router.post('/register', checkSchema(userRegisterSchema), authController.registe
 router.post("/login", checkSchema(userLoginSchema), authController.login)
 router.get("/user/profile", authenticateUser, authController.profile)
 router.put("/user/updateProfile", authenticateUser,authController.updateProfile)
-// router.get("/admin/dashboard", authorizeAdmin, authController.profile)
-router
+router.delete('/user/remove', authenticateUser,authController.deleteUser )
+router.get("/allAdmins", authController.allAdmins)
+router.get("/allUsers", authController.allUsers)
 
 export default router
